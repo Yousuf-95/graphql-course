@@ -11,6 +11,11 @@ const server = new ApolloServer({
         Query,
         Category,
         Product
+    },
+    context: {
+        products,
+        categories,
+        reviews
     }
 });
 
