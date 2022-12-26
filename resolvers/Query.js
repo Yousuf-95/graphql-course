@@ -2,8 +2,8 @@ exports.Query = {
     hello: () => {
         return "World";
     },
-    products: (parent, {filter}, {products, reviews}) => {
-        let filteredProducts = products;
+    products: (parent, {filter}, {db}) => {
+        let filteredProducts = db.products;
 
         if(filter) {
             const { onSale, avgRating } = filter;
@@ -32,13 +32,13 @@ exports.Query = {
 
         return filteredProducts;
     },
-    product: (parent, args, {products}) => {
+    product: (parent, args, {db}) => {
         let {id} = args;
-        return products.find((product) => product.id === id);
+        return db.products.find((product) => product.id === id);
     },
-    categories: (parent, args, {categories}) => {
-        return categories;
+    categories: (parent, args, {db}) => {
+        return db.categories;
     },
-    category: (parent, { id }, {categories}) => categories.find((category) => category.id === id),
-    review: (parent, args, {reviews}) => reviews
+    category: (parent, { id }, {db}) => db.categories.find((category) => category.id === id),
+    review: (parent, args, {db}) => db.reviews
 }
