@@ -1,4 +1,5 @@
 const validator = require('validator');
+const bcrypt = require('bcryptjs');
 
 const Mutation = {
     postCreate: async (parent, { post }, { posts }) => {
@@ -124,6 +125,16 @@ const Mutation = {
                 }
             }
              
+            const hashedPassword = await bcrypt.hash(password,10);
+
+            let result = await users.create({
+                name,
+                email,
+                password: hashedPassword,
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+            });
+
             return {
                 userErrors: [],
                 user: {
