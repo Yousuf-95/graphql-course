@@ -4,8 +4,8 @@ const { Query } = require("./resolvers/Query");
 const { Mutation } = require("./resolvers/Mutation");
 const typeDefs = require("./schema");
 const posts = require('../models/posts');
-const users = require('../models/posts');
-const profile = require('../models/posts');
+const users = require('../models/user');
+const profiles = require('../models/profile');
 
 
 
@@ -20,7 +20,7 @@ async function main() {
             context: {
                 posts,
                 users,
-                profile,
+                profiles,
             }
         });
 

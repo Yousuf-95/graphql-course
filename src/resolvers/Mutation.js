@@ -1,5 +1,6 @@
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const JWT = require('jsonwebtoken');
 
 const Mutation = {
     postCreate: async (parent, { post }, { posts }) => {
@@ -79,13 +80,13 @@ const Mutation = {
                 }
             }
 
-            let result = await posts.findOneAndDelete({_id: postId});
+            let result = await posts.findOneAndDelete({ _id: postId });
 
             return {
                 userErrors: [],
                 post: result
             }
-            
+
         }
         catch (error) {
             console.log(error);
@@ -100,34 +101,34 @@ const Mutation = {
     },
     signup: async (parent, args, { users }) => {
         try {
-            const {name, email, password, bio} = args;
+            const { name, email, password, bio } = args;
 
             const isEmail = validator.isEmail(email);
             const isValidPassword = validator.isLength(password, {
                 min: 5
             });
 
-            if(!isEmail || !isValidPassword){
+            if (!isEmail || !isValidPassword) {
                 return {
                     userErrors: [{
                         message: "Invalid email or password."
                     }],
-                    user: null
+                    token: null
                 }
             }
 
-            if(!name || !bio) {
+            if (!name || !bio) {
                 return {
                     userErrors: [{
                         message: "Invalid name or bio"
                     }],
-                    user: null
+                    token: null
                 }
             }
-             
-            const hashedPassword = await bcrypt.hash(password,10);
 
-            let result = await users.create({
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            let user = await users.create({
                 name,
                 email,
                 password: hashedPassword,
@@ -135,12 +136,20 @@ const Mutation = {
                 updatedAt: Date.now(),
             });
 
+            JWT_Signature = "usually a very long string";
+
+            const token = await JWT.sign(
+                {
+                    userId: user._id
+                },
+                JWT_Signature,
+                {
+                    expiresIn: 60000
+                });
+
             return {
                 userErrors: [],
-                user: {
-                    name,
-                    email
-                }
+                token: token
             }
 
         }
@@ -151,7 +160,7 @@ const Mutation = {
                 userErrors: [{
                     message: error.message
                 }],
-                user: null
+                token: null
             }
         }
     }
