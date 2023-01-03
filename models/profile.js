@@ -6,4 +6,4 @@ const profiles = mongoose.Schema({
     updatedAt: Date,
 });
 
-module.exports = mongoose.model("users", users);
+module.exports = mongoose.model("profiles", profiles);
