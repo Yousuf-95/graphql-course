@@ -1,6 +1,7 @@
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const JWT = require('jsonwebtoken');
+const canUserMutatePost = require('../utils/canUserMutatePost');
 
 const Mutation = {
     postCreate: async (parent, { post }, { posts, userInfo }) => {
@@ -38,8 +39,21 @@ const Mutation = {
             post: result
         };
     },
-    postUpdate: async (parent, { postId, post }, { posts }) => {
+    postUpdate: async (parent, { postId, post }, { posts, users, userInfo }) => {
         try {
+            if(!userInfo) {
+                return {
+                    userErrors: [{
+                        message: "You must be logged in to update a post"
+                    }],
+                    post: null
+                }
+            }
+
+            const error = await canUserMutatePost({userInfo, postId, posts, users});
+
+            if(error) return error;
+
             let { title, content } = post;
 
             if (!title && !content) {
@@ -60,7 +74,6 @@ const Mutation = {
             if (!content) delete payloadToUpdate.content;
 
             let result = await posts.findOneAndUpdate({ _id: postId }, { ...payloadToUpdate });
-            console.log(result);
 
             return {
                 userErrors: [],
@@ -79,8 +92,21 @@ const Mutation = {
             }
         }
     },
-    postDelete: async (parent, { postId }, { posts }) => {
+    postDelete: async (parent, { postId }, { posts, users, userInfo  }) => {
         try {
+            if(!userInfo) {
+                return {
+                    userErrors: [{
+                        message: "You must be logged in to update a post"
+                    }],
+                    post: null
+                }
+            }
+
+            const error = await canUserMutatePost({userInfo, postId, posts, users});
+
+            if(error) return error;
+
             if (!postId) {
                 return {
                     userErrors: [{
