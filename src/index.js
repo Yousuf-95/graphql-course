@@ -6,7 +6,7 @@ const typeDefs = require("./schema");
 const posts = require('../models/posts');
 const users = require('../models/user');
 const profiles = require('../models/profile');
-
+const getUserFromToken = require('./utils/getUserFromToken');
 
 
 async function main() {
@@ -17,10 +17,18 @@ async function main() {
                 Query,
                 Mutation
             },
-            context: {
-                posts,
-                users,
-                profiles,
+            context: async ({req}) => {
+                const token = req.headers.authorization;
+                // console.log(token);
+                // console.log(getUserFromToken(token))
+                const userInfo = await getUserFromToken(token);
+
+                return {
+                    posts,
+                    users,
+                    profiles,
+                    userInfo
+                }
             }
         });
 

@@ -3,7 +3,17 @@ const bcrypt = require('bcryptjs');
 const JWT = require('jsonwebtoken');
 
 const Mutation = {
-    postCreate: async (parent, { post }, { posts }) => {
+    postCreate: async (parent, { post }, { posts, userInfo }) => {
+
+        if(!userInfo) {
+            return {
+                userErrors: [{
+                    message: "You must be logged in to create a post"
+                }],
+                post: null
+            }
+        }
+
         let { title, content } = post;
 
         if (!title || !content) {
@@ -20,7 +30,7 @@ const Mutation = {
             content,
             createdAt: Date.now(),
             publishStatus: false,
-            authorId: 1,
+            authorId: userInfo.userId,
         });
 
         return {
@@ -143,7 +153,7 @@ const Mutation = {
                 updatedAt: user.updatedAt
             });
 
-            JWT_Signature = "usually a very long string";
+            const JWT_Signature = "usually a very long string";
 
             const token = await JWT.sign(
                 {
@@ -223,7 +233,7 @@ const Mutation = {
                 userErrors: [],
                 token: token
             }
-            
+
         }
         catch (error) {
             console.log(error);
