@@ -101,7 +101,8 @@ const Mutation = {
     },
     signup: async (parent, args, { users, profiles }) => {
         try {
-            const { name, email, password, bio } = args;
+            const { credentials, name, bio } = args;
+            const {email, password} = credentials;
 
             const isEmail = validator.isEmail(email);
             const isValidPassword = validator.isLength(password, {
@@ -158,6 +159,71 @@ const Mutation = {
                 token: token
             }
 
+        }
+        catch (error) {
+            console.log(error);
+
+            return {
+                userErrors: [{
+                    message: error.message
+                }],
+                token: null
+            }
+        }
+    },
+    signin: async (parent, args, { users }) => {
+        try {
+            const { credentials } = args;
+            const {email, password} = credentials;
+
+            const isEmail = validator.isEmail(email);
+            const isValidPassword = validator.isLength(password, {
+                min: 5
+            });
+
+            if (!isEmail || !isValidPassword) {
+                return {
+                    userErrors: [{
+                        message: "Invalid email or password."
+                    }],
+                    token: null
+                }
+            }
+
+            const user = await users.findOne({email});
+
+            if(!user){
+                return {
+                    userErrors: [{
+                        message: "Invalid email/password combination"
+                    }],
+                    token: ""
+                }
+            }
+            
+            const passwordMatched = await bcrypt.compare(password,user.password);
+            
+            if(!passwordMatched){
+                return {
+                    userErrors: [{
+                        message: "Invalid email/password combination"
+                    }],
+                    token: ""
+                }
+            }
+            
+            const JWT_Signature = "usually a very long string";
+
+            const token = await JWT.sign(
+                {userId: user._id},
+                JWT_Signature,
+                {expiresIn: 60000});
+
+            return {
+                userErrors: [],
+                token: token
+            }
+            
         }
         catch (error) {
             console.log(error);
