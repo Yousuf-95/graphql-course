@@ -99,7 +99,7 @@ const Mutation = {
             }
         }
     },
-    signup: async (parent, args, { users }) => {
+    signup: async (parent, args, { users, profiles }) => {
         try {
             const { name, email, password, bio } = args;
 
@@ -134,6 +134,12 @@ const Mutation = {
                 password: hashedPassword,
                 createdAt: Date.now(),
                 updatedAt: Date.now(),
+            });
+
+            await profiles.create({
+                bio,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt
             });
 
             JWT_Signature = "usually a very long string";
