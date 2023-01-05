@@ -174,6 +174,7 @@ const Mutation = {
             });
 
             await profiles.create({
+                email,
                 bio,
                 createdAt: user.createdAt,
                 updatedAt: user.updatedAt
@@ -271,7 +272,67 @@ const Mutation = {
                 token: null
             }
         }
-    }
+    },
+    postPublish: async (parent, {postId}, {users, posts, userInfo}) => {
+        if(!userInfo) {
+            return {
+                userErrors: [{
+                    message: "You must be logged in to publish a post"
+                }],
+                post: null
+            }
+        }
+
+        const error = await canUserMutatePost({userInfo, postId, posts, users});
+
+        if(error) return error;
+
+        if (!postId) {
+            return {
+                userErrors: [{
+                    message: "You must provide postId to publish a post"
+                }],
+                post: null
+            }
+        }
+
+        let result = await posts.findOneAndUpdate({_id: postId}, {publishStatus: true});
+
+        return {
+            userErrors: [],
+            post: result
+        }
+    },
+    postUnpublish: async (parent, {postId}, {users, posts, userInfo}) => {
+        if(!userInfo) {
+            return {
+                userErrors: [{
+                    message: "You must be logged in to unpublish a post"
+                }],
+                post: null
+            }
+        }
+
+        const error = await canUserMutatePost({userInfo, postId, posts, users});
+
+        if(error) return error;
+
+        if (!postId) {
+            return {
+                userErrors: [{
+                    message: "You must provide postId to unpublish a post"
+                }],
+                post: null
+            }
+        }
+
+        let result = await posts.findOneAndUpdate({_id: postId}, {publishStatus: false});
+
+        return {
+            userErrors: [],
+            post: result
+        }
+    },
 };
 
 module.exports = { Mutation };
