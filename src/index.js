@@ -2,12 +2,14 @@ const { ApolloServer } = require("apollo-server");
 const connect = require("./connect");
 const { Query } = require("./resolvers/Query");
 const { Mutation } = require("./resolvers/Mutation");
+const {Profile} = require("./resolvers/Profile");
+const { Post } = require("./resolvers/Post");
+const { User } = require("./resolvers/User");
 const typeDefs = require("./schema");
 const posts = require('../models/posts');
 const users = require('../models/user');
 const profiles = require('../models/profile');
 const getUserFromToken = require('./utils/getUserFromToken');
-
 
 async function main() {
     try {
@@ -15,7 +17,10 @@ async function main() {
             typeDefs,
             resolvers: {
                 Query,
-                Mutation
+                Mutation,
+                Profile,
+                Post,
+                User
             },
             context: async ({req}) => {
                 const token = req.headers.authorization;

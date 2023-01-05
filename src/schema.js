@@ -3,6 +3,8 @@ const {gql} = require("apollo-server");
 const typeDefs = gql`
     type Query {
         posts: [Post!]!
+        me: User
+        profile(email: String!): Profile
     }
 
     type Mutation {
