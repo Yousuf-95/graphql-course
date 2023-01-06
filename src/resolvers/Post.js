@@ -1,7 +1,9 @@
-const Post = {
-    user: async ({authorId}, args, {users}) => {
-        let result = await users.findOne({"_id": authorId});
+const userLoader = require('../loaders/userLoader');
 
+const Post = {
+    user: async ({authorId}, args, context) => {
+        let result = userLoader.load(authorId);
+        
         return result;
     }
 }
