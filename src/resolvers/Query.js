@@ -14,10 +14,26 @@ const Query = {
 
         return result;
     },
-    profile: async (parent, {email}, {profiles}) => {
-        let result = await profiles.findOne({"email": email});
-
-        return result;
+    profile: async (parent, {email}, {profiles, users, userInfo}) => {
+        try{
+            let profile = await profiles.findOne({"email": email}).lean();
+    
+            const user =  userInfo ? await users.findOne({"_id": userInfo?.userId}) : "";
+    
+            const isMyProfile = email === user?.email;
+    
+            if(!profile) {
+                return null;
+            }
+    
+            return {
+                ...profile,
+                isMyProfile
+            };
+        }
+        catch(error){
+            console.log(error);
+        }
     }
 }
 
