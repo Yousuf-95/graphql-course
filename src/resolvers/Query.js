@@ -27,6 +27,7 @@ const Query = {
             }
     
             return {
+                id: profile._id,
                 ...profile,
                 isMyProfile
             };
