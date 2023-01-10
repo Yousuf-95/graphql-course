@@ -1,17 +1,18 @@
 const User = {
     posts: async ({id}, args, {userInfo, posts}) => {
-        const isOwnProfile = id === userInfo?.userId;
-
-        if(isOwnProfile) {
-            return posts.find({"authodId": id});
+        try{
+            const isOwnProfile = id === userInfo?.userId;
+    
+            if(isOwnProfile) {
+                return await posts.find({"authorId": id});
+            }
+            else{
+                return await posts.find({ "$and": [ {"authorId": id}, { "publishStatus": true } ]}).lean();
+            }
         }
-        else{
-            return posts.find({ "$and": [ {"authorId": authodId}, { "publishStatus": true } ]});
+        catch(error){
+            console.log(error);
         }
-
-        // let result = await posts.find({"authorId": id});
-
-        // return result;
     } 
 }
 
