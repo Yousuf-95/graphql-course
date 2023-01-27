@@ -1,6 +1,6 @@
 const Query = {
     posts: async (parent, args, {posts}) => {
-        let result = await posts.find();
+        let result = await posts.find({"publishStatus": true});
 
         return result;
     },
